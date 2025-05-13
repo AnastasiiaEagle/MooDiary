@@ -133,15 +133,10 @@ exports.Prisma.PostsScalarFieldEnum = {
   id: 'id',
   title: 'title',
   content: 'content',
+  emotion: 'emotion',
   userId: 'userId',
-  emotionId: 'emotionId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-};
-
-exports.Prisma.EmotionsScalarFieldEnum = {
-  id: 'id',
-  name: 'name'
 };
 
 exports.Prisma.SortOrder = {
@@ -153,12 +148,17 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
-
+exports.EmotionType = exports.$Enums.EmotionType = {
+  HAPPY: 'HAPPY',
+  SAD: 'SAD',
+  ANGRY: 'ANGRY',
+  EXCITED: 'EXCITED',
+  CALM: 'CALM'
+};
 
 exports.Prisma.ModelName = {
   Users: 'Users',
-  Posts: 'Posts',
-  Emotions: 'Emotions'
+  Posts: 'Posts'
 };
 
 /**

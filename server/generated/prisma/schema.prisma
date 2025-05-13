@@ -35,14 +35,11 @@ model Posts {
 
   title   String
   content String
+  emotion EmotionType @default(HAPPY)
 
   // Зв’язок з користувачем
   userId String @map("user_id")
   user   Users  @relation(fields: [userId], references: [id])
-
-  // Зв’язок з емоцією
-  emotionId String   @map("emotion_id")
-  emotion   Emotions @relation(fields: [emotionId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -50,11 +47,10 @@ model Posts {
   @@map("posts")
 }
 
-model Emotions {
-  id String @id @default(uuid())
-
-  name  String
-  posts Posts[]
-
-  @@map("emotions")
+enum EmotionType {
+  HAPPY
+  SAD
+  ANGRY
+  EXCITED
+  CALM
 }
