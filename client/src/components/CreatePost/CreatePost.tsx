@@ -96,8 +96,8 @@ export default function CreatePost() {
                     <option value="HAPPY">😊 Щасливий</option>
                     <option value="SAD">😢 Сумний</option>
                     <option value="ANGRY">😠 Злий</option>
-                    <option value="NEUTRAL">😐 Нейтральний</option>
-                    <option value="EXCITED">🤩 Натхнення</option>
+                    <option value="CALM">😌 Спокій</option>
+                    <option value="EXCITED">🤩 Схвильований</option>
                 </select>
                 </div>
 
