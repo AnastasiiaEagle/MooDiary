@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { useRouter } from 'next/navigation';
 import axios from '../../utils/axios'
 
 export default function RegisterForm() {
@@ -9,6 +10,8 @@ export default function RegisterForm() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const router = useRouter();
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,6 +39,7 @@ export default function RegisterForm() {
             setPassword('');
             setName('')
             setMessage("Реєстрація пройшла успішно")
+            router.push('/')
         } catch (error: any) {
             if (error.response) {
                 setError(error.response.data?.message || 'Щось пішло не так...');

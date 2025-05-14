@@ -104,6 +104,21 @@ export class AuthService {
         return true
     }
 
+    async getMe(req: Request){
+        const refreshToken = req.cookies['refreshToken']
+        if (!refreshToken) throw new UnauthorizedException('Токен відсутній')
+        const payload = await this.jwtService.verifyAsync(refreshToken);
+        const user = await this.prismaService.users.findUnique({
+            where: {
+                id: payload.id
+            }
+        })
+
+        if(user){
+            return payload.id
+        }else return false
+    }
+
     private auth(res: Response, id: string){
         const { accessToken, refreshToken } = this.generateToken(id)
         this.setCookie(res, refreshToken, new Date(Date.now() + 1000 * 60 * 60 * 24 * 7))

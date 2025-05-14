@@ -31,4 +31,10 @@ export class AuthController {
   async logout (@Res({passthrough: true}) res: Response){
     return await this.authService.logout(res);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('me')
+  async getMe (@Req() req: Request){
+    return await this.authService.getMe(req);
+  }
 }

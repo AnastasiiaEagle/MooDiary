@@ -1,24 +1,75 @@
-
+"use client"
 // import Link from 'next/link';
-// import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 import Header from '@/components/Header/Header';
+import { jwtDecode } from 'jwt-decode';
+import axios from '../utils/axios'
+import Card from '@/components/Card/Card';
+import { CarInt } from '@/types/card';
+
 
 export default function Home() {
+  const [cards, setCards] = useState<CarInt[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // const router = useRouter();
+  const router = useRouter();
 
-  // const tokenSearch = ()=>{
-  //   const token = Cookies.get('token'); // Отримуємо токен з куків
-  //   if (token) {
-  //       console.log('Токен знайдений:', token);
-  //   } else {
-  //       console.log('Токен не знайдений');
-  //       router.push('/auth');
-  //   }
-  // }
+  function isAccessTokenValid(token: string): boolean {
+    try {
+        const decoded: { exp: number } = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+        return decoded.exp > currentTime;
+    } catch (error) {
+        return false;
+    }
+}
 
+  const tokenSearch = async()=>{
+    const token = Cookies.get('refreshToken');
+    const localToken = localStorage.getItem('accessToken');
+    
+    if(!token && !localToken){
+        console.log('Токен не знайдений');
+        router.push('/auth');
+    }else if(localToken !== null){
+      if(!isAccessTokenValid(localToken)){
+        try {
+            const res = await axios.get('/auth/refresh',
+            {
+                withCredentials: true
+            }
+            );
+            if (res.data.accessToken) {
+                localStorage.setItem('accessToken', res.data.accessToken);
+            }
+        } catch (error: any) {
+            console.log(error)
+        }
+      }
+    }
+  }
+
+  const getPosts = async () => {
+    setLoading(true)
+    try {
+      const res = await axios.get('/posts', 
+            {
+                withCredentials: true
+            });
+      
+      setLoading(false)
+      setCards(res.data)
+
+    } catch (error) {
+      
+    }
+  }
+
+  // const handleDelete = (id: number) => {
+  //   setCards(cards.filter(card => card.id !== id))
+  // };
   // const fetchTasks = async () => {
   //   const token = Cookies.get('token');
   //   if(token){
@@ -61,29 +112,51 @@ export default function Home() {
   //     fetchTasks();
   //   }
   // }
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await axios.delete(`/posts/${id}`, 
+            {
+                withCredentials: true
+            });
 
-  // const deleteTask = async (id: number) => {
-  //   const res = await fetch('/api/tasks', {
-  //     method: 'DELETE',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ id }),
-  //   });
+      if (res.status === 200) {
+      setCards((card) => card.filter((msg) => msg.id !== id));
+      } else {
+        console.error('Не вдалося видалити повідомлення');
+      }
+    } catch (error) {
+      
+    }}
 
-  //   if (res.ok) {
-  //     setTasks((prev) => prev.filter((msg) => msg.id !== id));
-  //   } else {
-  //     console.error('Не вдалося видалити повідомлення');
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   tokenSearch();
-  //   fetchTasks();
-  // }, []);
+  useEffect(() => {
+    tokenSearch();
+    getPosts();
+  }, []);
 
   return (
     <>
       <Header/>
+      {loading ? (
+        <p>Завантаження...</p>
+      ) : (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-5 px-5">
+          {Array.isArray(cards) ? cards.map((card) => (
+            <Card
+              key={card.id}
+              id={card.id} 
+              title={card.title}
+              content={card.content}
+              emotion={card.emotion}
+              onDelete={(id) => {
+                handleDelete(id).catch(console.error);
+              }}
+            />
+          )): "Список порожній =("}
+        </ul>
+      )}
     </>
   );
 }
+
+
+// можна зробити поіменний вивід користувачів та їх карток на окремій сторінці

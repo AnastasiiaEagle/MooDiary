@@ -43,7 +43,6 @@ export class PostsService {
         content: true,
         emotion: true,
         userId: true,
-        user: true,
         createdAt: true,
       })
     })
