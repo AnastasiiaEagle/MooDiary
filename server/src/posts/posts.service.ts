@@ -50,14 +50,43 @@ export class PostsService {
   }
 
   async findOne(id: string) {
-    return `This action returns a #${id} post`;
+    const post = await this.prismaService.posts.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if(!post){
+      throw new NotFoundException("Нічого не знайдено")
+    } 
+
+    return post
   }
 
   async update(id: string, dto: PostDto) {
-    return `This action updates a #${id} post`;
+    const post = await this.findOne(id)
+
+    await this.prismaService.posts.update({
+      where: {
+        id: post.id
+      },
+      data: {
+        title: dto.title,
+        content: dto.content,
+        emotion: dto.emotion
+      }
+    })
+    return "Оновлення пройшло успішно"
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} post`;
+    const post = await this.findOne(id)
+
+    await this.prismaService.posts.delete({
+      where: {
+        id
+      }
+    })
+    return "Видалення пройшло успішно"
   }
 }

@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { EmotionType } from "generated/prisma";
 
 
@@ -14,6 +14,7 @@ export class PostDto {
     @IsEnum(EmotionType)
     emotion: EmotionType
 
+    @IsOptional()
     @IsUUID()
-    userId: string
+    userId?: string
 }
