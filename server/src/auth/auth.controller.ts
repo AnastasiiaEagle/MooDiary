@@ -15,7 +15,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get('login')
+  @Post('login')
   async login (@Res({passthrough: true}) res: Response, @Body() dto: LoginRequest){
     return await this.authService.login(res, dto);
   }
@@ -29,6 +29,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('logout')
   async logout (@Res({passthrough: true}) res: Response){
-    return await this.authService.logout( res);
+    return await this.authService.logout(res);
   }
 }
