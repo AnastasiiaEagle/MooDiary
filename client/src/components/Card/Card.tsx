@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import axios from '../../utils/axios'
+import Link from 'next/link';
 
 type CardProps = {
     id: string,
@@ -27,12 +28,14 @@ export default function Card ({id, title, content, emotion, onDelete}:CardProps)
             </div>
 
             <div className="mt-3 flex justify-between">
-                <button
-                    className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-md transition"
-                    // onClick={() => handleEdit(id)}
-                >
-                    Редагувати
-                </button>
+                <Link href={`/update/${id}`}>
+                    <button
+                        className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-md transition"
+                        // onClick={() => handleEdit(id)}
+                    >
+                        Редагувати
+                    </button>
+                </Link>
                 <button
                     className="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md transition"
                     onClick={() => onDelete(id)}

@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import axios from '../utils/axios'
 import Card from '@/components/Card/Card';
 import { CarInt } from '@/types/card';
+import Filter from '@/components/Filter/Filter';
 
 
 export default function Home() {
@@ -63,55 +64,35 @@ export default function Home() {
       setCards(res.data)
 
     } catch (error) {
-      
+      console.log(error)
     }
   }
 
-  // const handleDelete = (id: number) => {
-  //   setCards(cards.filter(card => card.id !== id))
-  // };
-  // const fetchTasks = async () => {
-  //   const token = Cookies.get('token');
-  //   if(token){
-  //     const res = await fetch('/api/tasks',{
-  //       method: 'GET',
-  //       headers: {
-  //         'ContentType': 'application/json',
-  //         'Authorization': `Bearer ${token}`
-  //       },}
-  //     );
-      // if (res.ok) {
-      //   const data = await res.json();
-      //   setTasks(data);
-      // } else {
-      //   console.error('Не вдалося отримати повідомлення');
-      // }
-      // setLoading(false);
-  //   }
-  // };
-
-  // const filterTasks = async (progres: string) =>{
-  //   if(progres!==""){
-  //     const res = await fetch('/api/filter', {
-  //       method: 'POST',
-  //       headers: {
-  //         'ContentType': 'application/json',
-  //       },
-  //       body: JSON.stringify({progres}),
-  //     });
-  //     if (res.ok) {
-  //       const data = await res.json();
-       
-  //       setTasks(data);
+  const filterTasks = async (emotion: string) =>{
+    if(emotion!==""){
+        try {
+        const res = await axios.get('/posts', 
+              {
+                  withCredentials: true
+              });
         
-  //     } else {
-  //       console.error('Не вдалося отримати повідомлення');
-  //     }
-  //     setLoading(false);
-  //   }else{
-  //     fetchTasks();
-  //   }
-  // }
+        setLoading(false)
+        setCards(res.data)
+
+        if (res.status === 200) {
+         setCards((card) => card.filter((msg) => msg.emotion === emotion));
+        } else {
+          console.error('Не вдалося отримати повідомлення');
+        }
+      setLoading(false);
+      } catch (error) {
+        console.log(error)
+      }
+    } else {
+      getPosts()
+    }
+  }
+
   const handleDelete = async (id: string) => {
     try {
       const res = await axios.delete(`/posts/${id}`, 
@@ -136,6 +117,7 @@ export default function Home() {
   return (
     <>
       <Header/>
+      <Filter onFilter={filterTasks}/>
       {loading ? (
         <p>Завантаження...</p>
       ) : (

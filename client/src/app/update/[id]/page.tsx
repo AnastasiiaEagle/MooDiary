@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from "react"
-import axios from '../../utils/axios'
+import { useEffect, useState } from "react";
+import axios from '../../../utils/axios'
+import { useParams, useRouter } from "next/navigation";
 
 
-export default function CreatePost() {
+export default function Post() {
     const [title, setTitle] = useState('');
     const [content, setСontent] = useState('');
     const [emotion, setEmotion] = useState('')
@@ -12,51 +13,68 @@ export default function CreatePost() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    const router = useRouter()
+    const params = useParams()
+    const id = params.id
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
         setSuccess('');
+        
+        const postData = {
+            title,
+            content,
+            emotion
+        }
+        console.log(postData)
 
-        const id = await axios.get('/auth/me', 
+        try {
+            const res = await axios.patch(`/posts/${id}`, postData, 
             {
                 withCredentials: true
             })
-            console.log(id.data)
-        if(id){
-            const postData = {
-                title,
-                content,
-                emotion,
-                userId: id.data
-            }
-            console.log(postData)
 
+            setSuccess('Дані оновлено');
+            setTitle('');
+            setСontent('');
+            setLoading(false)
+
+            if(res.status === 200){
+                router.push('/');
+            }
+        } catch (error: any) {
+            console.log(error)
+            if (error.response) {
+                setError(error.response.data?.message || 'Щось пішло не так...');
+            } else {
+                setError('Помилка при надсиланні');
+            }
+        }
+    }
+
+    useEffect(()=>{
+         const getPostId = async () => {
             try {
-                const res = await axios.post('/posts', postData, 
+                const res = await axios.get(`/posts/${id}`,
                 {
                     withCredentials: true
                 })
 
-                setSuccess('Дані надіслано');
-                setTitle('');
-                setСontent('');
-                setLoading(false)
-            } catch (error: any) {
-                console.log(error)
-                if (error.response) {
-                    setError(error.response.data?.message || 'Щось пішло не так...');
-                } else {
-                    setError('Помилка при надсиланні');
-                }
+                setTitle(res.data.title);
+                setСontent(res.data.content);
+                setEmotion(res.data.emotion)
+            } catch (error) {
+                
             }
-        }else{
-            setError('Виникла помилка користувача');
         }
-    };
+        getPostId()
+    }, [id])
 
-    return(
-       <div className="flex items-center justify-center min-h-screen bg-gray-100">
+
+    return (
+         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <form
                 className="space-y-4 p-6 border rounded-lg shadow-lg bg-white w-full max-w-lg"
                 onSubmit={handleSubmit}
